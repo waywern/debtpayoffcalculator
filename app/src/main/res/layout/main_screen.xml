@@ -157,6 +157,16 @@
                     android:digits="0123456789."/>
             </LinearLayout>
         </RelativeLayout>
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-2285230333666171/3870881650">
+        </com.google.android.gms.ads.AdView>
         <RelativeLayout
             android:id="@+id/relative_layout_result_list"
             android:layout_width="wrap_content"

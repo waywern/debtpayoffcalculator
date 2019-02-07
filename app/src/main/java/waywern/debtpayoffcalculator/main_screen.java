@@ -35,6 +35,11 @@ import static android.content.ContentValues.TAG;
 
 //import org.apache.http.client.methods.*;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 public class main_screen extends AppCompatActivity {
 
     private EditText mBalance_EditText;
@@ -45,6 +50,7 @@ public class main_screen extends AppCompatActivity {
     private AlertDialog.Builder builder;
     private Button mCalculateButton;
     Activity activity;
+    private AdView mAdView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,38 @@ public class main_screen extends AppCompatActivity {
         //builder = new AlertDialog.Builder(this);
 
         activity = this;
+        MobileAds.initialize(this, "ca-app-pub-2285230333666171~1627861698");
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
         mBalance_EditText = (EditText)findViewById(R.id.editText_balance);
         mAPP_Per_Year_EditText = (EditText)findViewById(R.id.editText_apr_per_year);
         mNumber_Of_Month_EditText = (EditText)findViewById(R.id.editText_number_of_month);
