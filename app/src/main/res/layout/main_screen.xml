@@ -173,14 +173,18 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/relative_layout_monthly_payment"
             >
+
             <ListView
                 android:id="@+id/list_view_result_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:headerDividersEnabled="false"/>
+                android:layout_marginStart="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                android:headerDividersEnabled="false" />
         </RelativeLayout>
     </RelativeLayout>
 
