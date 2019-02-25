@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -35,6 +36,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -46,6 +48,9 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 public class main_screen extends AppCompatActivity {
 
@@ -55,10 +60,12 @@ public class main_screen extends AppCompatActivity {
     private EditText editText_monthly_payment;
     private AlertDialog alert;
     private AlertDialog.Builder builder;
-    private Button mCalculateButton;
+    private Button mCalculateButton, mButton_table_or_graph;
     Activity activity;
     private AdView mAdView;
     private ScrollView main_screen_scroll_view;
+    private RelativeLayout mMain_screen_for_scroll, mMain_screen_for_graph;
+    private GraphView mGraph;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +117,11 @@ public class main_screen extends AppCompatActivity {
         mNumber_Of_Month_EditText = (EditText)findViewById(R.id.editText_number_of_month);
         editText_monthly_payment = (EditText)findViewById(R.id.editText_monthly_payment);
         mCalculateButton = (Button)findViewById(R.id.button_calculate);
+        mButton_table_or_graph = (Button)findViewById(R.id.button_table_or_graph);
+        mMain_screen_for_scroll = (RelativeLayout)findViewById(R.id.main_screen_for_scroll);
+        mMain_screen_for_graph = (RelativeLayout)findViewById(R.id.main_screen_for_graph);
+        mGraph = (GraphView) findViewById(R.id.graph);
+
         mCalculateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +135,7 @@ public class main_screen extends AppCompatActivity {
                     return;
                 }
                 try {
+                    mGraph.removeAllSeries();
                     double balance = Double.parseDouble(mBalance_EditText.getText().toString());
                     double apr_per_year = Double.parseDouble(mAPP_Per_Year_EditText.getText().toString());
                     double number_of_month = Double.parseDouble(mNumber_Of_Month_EditText.getText().toString());
@@ -174,12 +187,18 @@ public class main_screen extends AppCompatActivity {
                     main_screen_table_header.addView(tv4);
                     main_screen_table.addView(main_screen_table_header);
 
+                    DataPoint[] datapoint_for_graph = new DataPoint[]{};
+
+
                     for (month = 1; month <= number_of_month; month++) {
 
                         interestPaid  = (double) Math.round( (balance      * (monthlyInterestRate / 100) ) * 100) / 100;
                         principalPaid = (double) Math.round( (monthly_payment - interestPaid) * 100) / 100;
                         newBalance    = (double) Math.round( (balance      - principalPaid) * 100) / 100;
                         total_interest_paid = (double) Math.round( (total_interest_paid + interestPaid) * 100) / 100;
+
+                        DataPoint datapoint = new DataPoint(month, total_interest_paid);
+                        datapoint_for_graph = append(datapoint_for_graph, datapoint);
 
                         /*System.out.println("");
                         System.out.println("# of month :" + month);
@@ -225,6 +244,13 @@ public class main_screen extends AppCompatActivity {
                     }
                     main_screen_scroll_view.removeAllViews();
                     main_screen_scroll_view.addView(main_screen_table);
+                    for(int i = 0; i < datapoint_for_graph.length; i++)
+                    {
+                        System.out.println("");
+                        System.out.println("datapoint_for_graph[i].getX() " + datapoint_for_graph[i].getX() + "datapoint_for_graph[i].getY() " + datapoint_for_graph[i].getY());
+                    }
+                    LineGraphSeries<DataPoint> series = new LineGraphSeries<>(datapoint_for_graph);
+                    mGraph.addSeries(series);
 
                 } catch(Exception ex){
                     Toast.makeText(activity, "Sorry, I can't make this calculation", Toast.LENGTH_LONG).show();
@@ -233,7 +259,29 @@ public class main_screen extends AppCompatActivity {
             }
         });
 
+        mButton_table_or_graph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(mMain_screen_for_scroll.getVisibility() == RelativeLayout.GONE) {
+                    mMain_screen_for_graph.setVisibility(RelativeLayout.GONE);
+                    mMain_screen_for_scroll.setVisibility(RelativeLayout.VISIBLE);
+                } else {
+                    mMain_screen_for_graph.setVisibility(RelativeLayout.VISIBLE);
+                    mMain_screen_for_scroll.setVisibility(RelativeLayout.GONE);
+                }
+            }
+        });
+
     }
+
+    static <DataPoint> DataPoint[] append(DataPoint[] arr, DataPoint element) {
+        final int N = arr.length;
+        arr = Arrays.copyOf(arr, N + 1);
+        arr[N] = element;
+        return arr;
+    }
+
 
     @Override
     public void onDestroy() {

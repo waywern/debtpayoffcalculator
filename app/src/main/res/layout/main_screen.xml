@@ -172,6 +172,13 @@
             android:layout_height="wrap_content"
 
             android:text="Calculate" />
+
+        <Button
+            android:id="@+id/button_table_or_graph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/button_calculate"
+            android:text="Switch to Graph" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -188,6 +195,20 @@
 
         </ScrollView>
 
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/main_screen_for_graph"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/adView"
+        android:layout_below="@+id/relative_layout_calculate"
+        android:visibility="gone"
+        >
+            <com.jjoe64.graphview.GraphView
+                android:layout_width="match_parent"
+                android:layout_height="200dip"
+                android:id="@+id/graph" />
     </RelativeLayout>
 
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
