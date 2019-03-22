@@ -179,6 +179,13 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/button_calculate"
             android:text="Switch to Graph" />
+
+        <Button
+            android:id="@+id/button_support_project"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/button_table_or_graph"
+            android:text="Support Project" />
     </RelativeLayout>
 
     <RelativeLayout

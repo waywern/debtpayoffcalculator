@@ -37,6 +37,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardItem;
+import com.google.android.gms.ads.reward.RewardedVideoAd;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -48,11 +52,13 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.reward.RewardedVideoAdListener;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-public class main_screen extends AppCompatActivity {
+public class main_screen extends AppCompatActivity implements RewardedVideoAdListener {
 
     private EditText mBalance_EditText;
     private EditText mAPP_Per_Year_EditText;
@@ -60,12 +66,13 @@ public class main_screen extends AppCompatActivity {
     private EditText editText_monthly_payment;
     private AlertDialog alert;
     private AlertDialog.Builder builder;
-    private Button mCalculateButton, mButton_table_or_graph;
+    private Button mCalculateButton, mButton_table_or_graph, mButton_support_project;
     Activity activity;
     private AdView mAdView;
     private ScrollView main_screen_scroll_view;
     private RelativeLayout mMain_screen_for_scroll, mMain_screen_for_graph;
     private GraphView mGraph;
+    private RewardedVideoAd mRewardedVideoAd;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,10 +88,14 @@ public class main_screen extends AppCompatActivity {
         main_screen_scroll_view = (ScrollView) findViewById(R.id.main_screen_scroll_view);
         activity = this;
         MobileAds.initialize(this, "ca-app-pub-2285230333666171~1627861698");
+        MobileAds.initialize(this, "ca-app-pub-2285230333666171~1627861698");
+        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        mRewardedVideoAd.setRewardedVideoAdListener(this);
+        loadRewardedVideoAd();
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
+        /*mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
@@ -111,7 +122,7 @@ public class main_screen extends AppCompatActivity {
                 // Code to be executed when when the user is about to return
                 // to the app after tapping on an ad.
             }
-        });
+        });*/
         mBalance_EditText = (EditText)findViewById(R.id.editText_balance);
         mAPP_Per_Year_EditText = (EditText)findViewById(R.id.editText_apr_per_year);
         mNumber_Of_Month_EditText = (EditText)findViewById(R.id.editText_number_of_month);
@@ -121,6 +132,7 @@ public class main_screen extends AppCompatActivity {
         mMain_screen_for_scroll = (RelativeLayout)findViewById(R.id.main_screen_for_scroll);
         mMain_screen_for_graph = (RelativeLayout)findViewById(R.id.main_screen_for_graph);
         mGraph = (GraphView) findViewById(R.id.graph);
+        mButton_support_project = (Button)findViewById(R.id.button_support_project);
 
         mCalculateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -251,6 +263,11 @@ public class main_screen extends AppCompatActivity {
                     }
                     LineGraphSeries<DataPoint> series = new LineGraphSeries<>(datapoint_for_graph);
                     mGraph.addSeries(series);
+                    //series.setTitle("X - Total Interest; Y - duration");
+                    //mGraph.getLegendRenderer().setVisible(true);
+                    //mGraph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+                    mGraph.getGridLabelRenderer().setHorizontalAxisTitle("Duration (month)");
+                    mGraph.getGridLabelRenderer().setVerticalAxisTitle("Total Interest");
 
                 } catch(Exception ex){
                     Toast.makeText(activity, "Sorry, I can't make this calculation", Toast.LENGTH_LONG).show();
@@ -273,6 +290,59 @@ public class main_screen extends AppCompatActivity {
             }
         });
 
+        mButton_support_project.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mRewardedVideoAd.isLoaded()) {
+                    mRewardedVideoAd.show();
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onRewarded(RewardItem reward) {
+        Toast.makeText(this, "onRewarded! currency: " + reward.getType() + "  amount: " +
+                reward.getAmount(), Toast.LENGTH_SHORT).show();
+        // Reward the user.
+    }
+
+    @Override
+    public void onRewardedVideoAdLeftApplication() {
+        Toast.makeText(this, "onRewardedVideoAdLeftApplication",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdClosed() {
+        Toast.makeText(this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+        loadRewardedVideoAd();
+    }
+
+    @Override
+    public void onRewardedVideoAdFailedToLoad(int errorCode) {
+        Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdLoaded() {
+        Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoAdOpened() {
+        Toast.makeText(this, "onRewardedVideoAdOpened", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoStarted() {
+        Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRewardedVideoCompleted() {
+        Toast.makeText(this, "onRewardedVideoCompleted", Toast.LENGTH_SHORT).show();
     }
 
     static <DataPoint> DataPoint[] append(DataPoint[] arr, DataPoint element) {
@@ -282,10 +352,29 @@ public class main_screen extends AppCompatActivity {
         return arr;
     }
 
+    @Override
+    public void onResume() {
+        mRewardedVideoAd.resume(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        mRewardedVideoAd.pause(this);
+        super.onPause();
+    }
 
     @Override
     public void onDestroy() {
+        mRewardedVideoAd.destroy(this);
         super.onDestroy();
         Runtime.getRuntime().gc();
+    }
+
+    private void loadRewardedVideoAd() {
+        /*mRewardedVideoAd.loadAd("ca-app-pub-2285230333666171/2227083958",
+                new AdRequest.Builder().build());*/
+        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+                new AdRequest.Builder().build());
     }
 }
