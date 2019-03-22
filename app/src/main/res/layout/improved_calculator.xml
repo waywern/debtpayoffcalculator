@@ -42,13 +42,6 @@
             android:shadowRadius="5"
             android:shadowDx="5"
             />
-        <ImageView
-            android:id="@+id/main_header_popup"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignBottom="@+id/main_header"
-            android:layout_alignParentRight="true"
-            app:srcCompat="@drawable/menu_icon" />
     </RelativeLayout>
 
     <LinearLayout
@@ -71,6 +64,7 @@
             android:id="@+id/editText_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:width="250px"
             android:background="@drawable/edittextbackground"
             android:digits="0123456789"
             android:ems="10"
@@ -101,6 +95,7 @@
             android:id="@+id/editText_apr_per_year"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:width="250px"
             android:background="@drawable/edittextbackground"
             android:digits="0123456789."
             android:ems="10"
@@ -130,11 +125,19 @@
             android:id="@+id/editText_number_of_month"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:width="250px"
             android:background="@drawable/edittextbackground"
             android:digits="0123456789"
             android:ems="10"
             android:padding="3dp"
             android:textSize="20sp" />
+
+        <Switch
+            android:id="@+id/month_or_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=" Month/Year" />
     </LinearLayout>
 
     <LinearLayout
@@ -159,6 +162,7 @@
             android:id="@+id/editText_monthly_payment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:width="250px"
             android:background="@drawable/edittextbackground"
             android:digits="0123456789."
             android:ems="10"
@@ -219,10 +223,10 @@
         android:layout_below="@+id/relative_layout_calculate"
         android:visibility="gone"
         >
-            <com.jjoe64.graphview.GraphView
-                android:layout_width="match_parent"
-                android:layout_height="200dip"
-                android:id="@+id/graph" />
+        <com.jjoe64.graphview.GraphView
+            android:layout_width="match_parent"
+            android:layout_height="200dip"
+            android:id="@+id/graph" />
     </RelativeLayout>
 
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
