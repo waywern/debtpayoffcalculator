@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +25,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONObject;
 
@@ -376,9 +377,9 @@ public class improved_calculator extends AppCompatActivity implements RewardedVi
     }
 
     private void loadRewardedVideoAd() {
-        /*mRewardedVideoAd.loadAd("ca-app-pub-2285230333666171/2227083958",
-                new AdRequest.Builder().build());*/
-        mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+        mRewardedVideoAd.loadAd("ca-app-pub-2285230333666171/2227083958",
                 new AdRequest.Builder().build());
+        /*mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
+                new AdRequest.Builder().build());*/
     }
 }

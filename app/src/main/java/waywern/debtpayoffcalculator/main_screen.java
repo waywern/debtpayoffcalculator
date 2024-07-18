@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +24,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONObject;
 
@@ -38,13 +39,17 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.ads.reward.RewardItem;
 import com.google.android.gms.ads.reward.RewardedVideoAd;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import static android.content.ContentValues.TAG;
+import static waywern.debtpayoffcalculator.improved_calculator.append;
 
 //import org.apache.http.client.methods.*;
 
@@ -58,7 +63,7 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-public class main_screen extends AppCompatActivity implements RewardedVideoAdListener {
+public class main_screen extends AppCompatActivity /*implements RewardedVideoAdListener*/ {
 
     private EditText mBalance_EditText;
     private EditText mAPP_Per_Year_EditText;
@@ -72,7 +77,8 @@ public class main_screen extends AppCompatActivity implements RewardedVideoAdLis
     private ScrollView main_screen_scroll_view;
     private RelativeLayout mMain_screen_for_scroll, mMain_screen_for_graph;
     private GraphView mGraph;
-    private RewardedVideoAd mRewardedVideoAd;
+    //private RewardedVideoAd mRewardedVideoAd;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,42 +93,33 @@ public class main_screen extends AppCompatActivity implements RewardedVideoAdLis
         //builder = new AlertDialog.Builder(this);
         main_screen_scroll_view = (ScrollView) findViewById(R.id.main_screen_scroll_view);
         activity = this;
-        MobileAds.initialize(this, "ca-app-pub-2285230333666171~1627861698");
-        MobileAds.initialize(this, "ca-app-pub-2285230333666171~1627861698");
-        mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
-        mRewardedVideoAd.setRewardedVideoAdListener(this);
-        loadRewardedVideoAd();
+        //MobileAds.initialize(this, "ca-app-pub-2285230333666171/4568724183");
+        //MobileAds.initialize(this, "ca-app-pub-2285230333666171~1627861698");
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        mInterstitialAd = new InterstitialAd(this);
+        //REAL ID
+        mInterstitialAd.setAdUnitId("ca-app-pub-2285230333666171/4568724183");
+        //TEST ID
+        //mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                // Load the next interstitial.
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+
+        });
+        //mRewardedVideoAd = MobileAds.getRewardedVideoAdInstance(this);
+        //mRewardedVideoAd.setRewardedVideoAdListener(this);
+        //loadRewardedVideoAd();
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
-        /*mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                // Code to be executed when an ad request fails.
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                // Code to be executed when the user has left the app.
-            }
-
-            @Override
-            public void onAdClosed() {
-                // Code to be executed when when the user is about to return
-                // to the app after tapping on an ad.
-            }
-        });*/
         mBalance_EditText = (EditText)findViewById(R.id.editText_balance);
         mAPP_Per_Year_EditText = (EditText)findViewById(R.id.editText_apr_per_year);
         mNumber_Of_Month_EditText = (EditText)findViewById(R.id.editText_number_of_month);
@@ -293,56 +290,59 @@ public class main_screen extends AppCompatActivity implements RewardedVideoAdLis
         mButton_support_project.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mRewardedVideoAd.isLoaded()) {
+                /*if (mRewardedVideoAd.isLoaded()) {
                     mRewardedVideoAd.show();
+                }*/
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
                 }
             }
         });
 
     }
 
-    @Override
+    /*@Override
     public void onRewarded(RewardItem reward) {
-        Toast.makeText(this, "onRewarded! currency: " + reward.getType() + "  amount: " +
-                reward.getAmount(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewarded! currency: " + reward.getType() + "  amount: " + reward.getAmount(), Toast.LENGTH_SHORT).show();
         // Reward the user.
     }
 
     @Override
     public void onRewardedVideoAdLeftApplication() {
-        Toast.makeText(this, "onRewardedVideoAdLeftApplication",
-                Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewardedVideoAdLeftApplication", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoAdClosed() {
-        Toast.makeText(this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewardedVideoAdClosed", Toast.LENGTH_SHORT).show();
         loadRewardedVideoAd();
     }
 
     @Override
     public void onRewardedVideoAdFailedToLoad(int errorCode) {
-        Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewardedVideoAdFailedToLoad", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoAdLoaded() {
-        Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewardedVideoAdLoaded", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoAdOpened() {
-        Toast.makeText(this, "onRewardedVideoAdOpened", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewardedVideoAdOpened", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoStarted() {
-        Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewardedVideoStarted", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRewardedVideoCompleted() {
-        Toast.makeText(this, "onRewardedVideoCompleted", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onRewardedVideoCompleted", Toast.LENGTH_SHORT).show();
     }
 
     static <DataPoint> DataPoint[] append(DataPoint[] arr, DataPoint element) {
@@ -354,27 +354,27 @@ public class main_screen extends AppCompatActivity implements RewardedVideoAdLis
 
     @Override
     public void onResume() {
-        mRewardedVideoAd.resume(this);
+        //mRewardedVideoAd.resume(this);
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        mRewardedVideoAd.pause(this);
+        //mRewardedVideoAd.pause(this);
         super.onPause();
-    }
+    }*/
 
     @Override
     public void onDestroy() {
-        mRewardedVideoAd.destroy(this);
+        //mRewardedVideoAd.destroy(this);
         super.onDestroy();
         Runtime.getRuntime().gc();
     }
 
-    private void loadRewardedVideoAd() {
-        /*mRewardedVideoAd.loadAd("ca-app-pub-2285230333666171/2227083958",
-                new AdRequest.Builder().build());*/
+    /*private void loadRewardedVideoAd() {
+        //mRewardedVideoAd.loadAd("ca-app-pub-2285230333666171/2227083958",
+                //new AdRequest.Builder().build());
         mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917",
                 new AdRequest.Builder().build());
-    }
+    }*/
 }
